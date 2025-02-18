@@ -1,0 +1,29 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: FarmlyBollingerBandsStrategy
+    network: base-sepolia
+    source:
+      address: "0xb3dCd3Ac7a885DabECF9d6359bEcD495d7fB5245"
+      abi: FarmlyBollingerBandsStrategy
+      startBlock: 22013113
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NewBands
+        - OwnershipTransferred
+      abis:
+        - name: FarmlyBollingerBandsStrategy
+          file: ./abis/FarmlyBollingerBandsStrategy.json
+      eventHandlers:
+        - event: NewBands(uint256,uint256,uint256,uint256,uint256)
+          handler: handleNewBands
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/farmly-bollinger-bands-strategy.ts
