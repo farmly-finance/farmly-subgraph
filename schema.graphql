@@ -1,20 +1,124 @@
-type NewBands @entity(immutable: true) {
+type FarmlyStrategy @entity {
   id: Bytes!
-  price: BigInt! # uint256
-  lowerBand: BigInt! # uint256
-  upperBand: BigInt! # uint256
-  midBand: BigInt! # uint256
-  timestamp: BigInt! # uint256
+  strategyAddress: Bytes!
+  MA: BigInt!
+  STD: BigInt!
+  PERIOD: BigInt!
+  rebalanceThreshold: BigInt!
+  latestTimestamp: BigInt!
+  nextPeriodStartTimestamp: BigInt!
+  bands: [NewBands!]! @derivedFrom(field: "farmlyStrategy")
+}
+
+type FarmlyEasyFarm @entity {
+  id: Bytes!
+  easyFarmAddress: Bytes!
+  shareTokenName: String!
+  shareTokenSymbol: String!
+  shareTokenDecimals: BigInt!
+  strategy: FarmlyStrategy!
+  executor: Bytes!
+  token0: Bytes!
+  token1: Bytes!
+  token0Decimals: BigInt!
+  token1Decimals: BigInt!
+  deposits: [Deposit!]! @derivedFrom(field: "farmlyEasyFarm")
+  withdraws: [Withdraw!]! @derivedFrom(field: "farmlyEasyFarm")
+  approvals: [Approval!]! @derivedFrom(field: "farmlyEasyFarm")
+  performPositions: [PerformPosition!]! @derivedFrom(field: "farmlyEasyFarm")
+}
+
+type NewBands @entity {
+  id: Bytes!
+  price: BigInt!
+  lowerBand: BigInt!
+  upperBand: BigInt!
+  midBand: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  farmlyStrategy: FarmlyStrategy!
+}
+
+type OwnershipTransferred @entity {
+  id: Bytes!
+  previousOwner: Bytes!
+  newOwner: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type OwnershipTransferred @entity(immutable: true) {
+type Approval @entity {
   id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
+  owner: Bytes!
+  spender: Bytes!
+  value: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  farmlyEasyFarm: FarmlyEasyFarm!
+}
+
+type Deposit @entity {
+  id: Bytes!
+  amount0: BigInt!
+  amount1: BigInt!
+  shareAmount: BigInt!
+  depositUSD: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  farmlyEasyFarm: FarmlyEasyFarm!
+}
+
+type Paused @entity {
+  id: Bytes!
+  account: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PerformPosition @entity {
+  id: Bytes!
+  lowerPrice: BigInt!
+  upperPrice: BigInt!
+  sharePrice: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  farmlyEasyFarm: FarmlyEasyFarm!
+}
+
+type Transfer @entity {
+  id: Bytes!
+  from: Bytes!
+  to: Bytes!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Unpaused @entity {
+  id: Bytes!
+  account: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Withdraw @entity {
+  id: Bytes!
+  amount0: BigInt!
+  amount1: BigInt!
+  shareAmount: BigInt!
+  withdrawUSD: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  farmlyEasyFarm: FarmlyEasyFarm!
 }

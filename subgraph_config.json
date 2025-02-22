@@ -1,0 +1,40 @@
+{
+  "dataSources": [
+    {
+      "name": "FarmlyBollingerBandsStrategy",
+      "network": "base-sepolia",
+      "address": "0xb3dCd3Ac7a885DabECF9d6359bEcD495d7fB5245",
+      "startBlock": 22013113
+    },
+    {
+      "name": "FarmlyBollingerBandsStrategy_WETHBTC",
+      "network": "base-sepolia",
+      "address": "0xc6813Fea485321811632693AF3C3b07358b01E28",
+      "startBlock": 22145651
+    },
+    {
+      "name": "FarmlyBollingerBandsStrategy_BTCUSDC",
+      "network": "base-sepolia",
+      "address": "0x1647De7144851c907e0F1B87d0012ae7932A566e",
+      "startBlock": 22145985
+    },
+    {
+      "name": "FarmlyBollingerBandsStrategy_USDCBTC",
+      "network": "base-sepolia",
+      "address": "0x1ECBb0AF58607ecE24F9c4AAEF96F727BB6FFC62",
+      "startBlock": 22188242
+    },
+    {
+      "name": "FarmlyEasyFarm_ETHUSDC",
+      "network": "base-sepolia",
+      "address": "0x3d32e94F9Dc0bFB0d43ad7e4DB5775db869f277E",
+      "startBlock": 22224898
+    },
+    {
+      "name": "FarmlyEasyFarm_WETHBTC",
+      "network": "base-sepolia",
+      "address": "0x33555e1ee4014AED32A94FA359C0cD8616EE6Ed1",
+      "startBlock": 22224989
+    }
+  ]
+} 

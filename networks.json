@@ -3,6 +3,10 @@
     "FarmlyBollingerBandsStrategy": {
       "address": "0xb3dCd3Ac7a885DabECF9d6359bEcD495d7fB5245",
       "startBlock": 22013113
+    },
+    "FarmlyEasyFarm": {
+      "address": "0x85Fb5a09b22c0e6ba0c01710793f307F29166459",
+      "startBlock": 22051447
     }
   }
 }
