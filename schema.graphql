@@ -1,44 +1,21 @@
-type FarmlyStrategy @entity {
-  id: Bytes!
-  strategyAddress: Bytes!
-  MA: BigInt!
-  STD: BigInt!
-  PERIOD: BigInt!
-  rebalanceThreshold: BigInt!
-  latestTimestamp: BigInt!
-  nextPeriodStartTimestamp: BigInt!
-  bands: [NewBands!]! @derivedFrom(field: "farmlyStrategy")
-}
-
 type FarmlyEasyFarm @entity {
   id: Bytes!
   easyFarmAddress: Bytes!
   shareTokenName: String!
   shareTokenSymbol: String!
   shareTokenDecimals: BigInt!
-  strategy: FarmlyStrategy!
+  strategy: Bytes!
   executor: Bytes!
   token0: Bytes!
   token1: Bytes!
   token0Decimals: BigInt!
   token1Decimals: BigInt!
+  latestHourIndex: BigInt!
   deposits: [Deposit!]! @derivedFrom(field: "farmlyEasyFarm")
   withdraws: [Withdraw!]! @derivedFrom(field: "farmlyEasyFarm")
   approvals: [Approval!]! @derivedFrom(field: "farmlyEasyFarm")
   performPositions: [PerformPosition!]! @derivedFrom(field: "farmlyEasyFarm")
-}
-
-type NewBands @entity {
-  id: Bytes!
-  price: BigInt!
-  lowerBand: BigInt!
-  upperBand: BigInt!
-  midBand: BigInt!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-  farmlyStrategy: FarmlyStrategy!
+  pricePeriods: [PricePeriod!]! @derivedFrom(field: "farmlyEasyFarm")
 }
 
 type OwnershipTransferred @entity {
@@ -120,5 +97,16 @@ type Withdraw @entity {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  farmlyEasyFarm: FarmlyEasyFarm!
+}
+
+type PricePeriod @entity {
+  id: ID!
+  sharePrice: BigInt!
+  latestPrice: BigInt!
+  latestUpperPrice: BigInt!
+  latestLowerPrice: BigInt!
+  startTimestamp: Int!
+  endTimestamp: Int!
   farmlyEasyFarm: FarmlyEasyFarm!
 }

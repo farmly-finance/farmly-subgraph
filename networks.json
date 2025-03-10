@@ -4,9 +4,37 @@
       "address": "0xb3dCd3Ac7a885DabECF9d6359bEcD495d7fB5245",
       "startBlock": 22013113
     },
+    "FarmlyBollingerBandsStrategy_WETHBTC": {
+      "address": "0xc6813Fea485321811632693AF3C3b07358b01E28",
+      "startBlock": 22145651
+    },
+    "FarmlyBollingerBandsStrategy_BTCUSDC": {
+      "address": "0x1647De7144851c907e0F1B87d0012ae7932A566e",
+      "startBlock": 22145985
+    },
+    "FarmlyBollingerBandsStrategy_USDCBTC": {
+      "address": "0x1ECBb0AF58607ecE24F9c4AAEF96F727BB6FFC62",
+      "startBlock": 22188242
+    },
     "FarmlyEasyFarm": {
-      "address": "0x85Fb5a09b22c0e6ba0c01710793f307F29166459",
-      "startBlock": 22051447
+      "address": "0x341f2865ec9B116Aa1FE3b29EB2052Bb305c7A10",
+      "startBlock": 22918230
+    },
+    "FarmlyEasyFarm_WETHBTC": {
+      "address": "0x33555e1ee4014AED32A94FA359C0cD8616EE6Ed1",
+      "startBlock": 22224989
+    },
+    "FarmlyEasyFarm_ETHUSDC_FIXED_RANGE": {
+      "address": "0x8caBfe02EC4a87cB5F4ef9ec45C21e993386e801",
+      "startBlock": 22758270
+    },
+    "FarmlyEasyFarm_WBTCETH_FIXED_RANGE": {
+      "address": "0xD7db6799B26bB9CED0589990A9dBE383C6Dd0ebE",
+      "startBlock": 22918166
+    },
+    "FarmlyEasyFarm_USDCBTC_FIXED_RANGE": {
+      "address": "0xeBed27b12176B9f0CE84173140f12A3457773623",
+      "startBlock": 22918056
     }
   }
 }

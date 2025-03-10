@@ -59,6 +59,13 @@ var blockHandlersEasyFarm = [
             kind: "once",
         },
     },
+    {
+        handler: "handlePricePeriod",
+        filter: {
+            kind: "polling",
+            every: 1,
+        },
+    },
 ];
 var blockHandlersBollingerBandsStrategy = [
     {
@@ -72,6 +79,10 @@ function generateSubgraphYaml(configPath) {
     // Read the JSON configuration
     var configContent = fs.readFileSync(configPath, "utf-8");
     var config = JSON.parse(configContent);
+    // Read the networks configuration
+    var networksPath = "networks.json";
+    var networksContent = fs.readFileSync(networksPath, "utf-8");
+    var networksConfig = JSON.parse(networksContent);
     // Base subgraph configuration
     var subgraphConfig = {
         specVersion: "1.0.0",
@@ -83,9 +94,18 @@ function generateSubgraphYaml(configPath) {
         },
         dataSources: [],
     };
-    // Add data sources from the configuration
+    // Add data sources from the configuration and update networks.json
     for (var _i = 0, _a = config.dataSources; _i < _a.length; _i++) {
         var source = _a[_i];
+        var network = source.network || "base-sepolia";
+        // Update networks.json
+        if (!networksConfig[network]) {
+            networksConfig[network] = {};
+        }
+        networksConfig[network][source.name] = {
+            address: source.address,
+            startBlock: source.startBlock,
+        };
         var mapping = {
             kind: "ethereum/events",
             apiVersion: "0.0.7",
@@ -116,7 +136,7 @@ function generateSubgraphYaml(configPath) {
         var dataSource = {
             kind: "ethereum",
             name: source.name,
-            network: source.network || "base-sepolia",
+            network: network,
             source: {
                 address: source.address,
                 abi: source.name.startsWith("FarmlyEasyFarm")
@@ -128,6 +148,8 @@ function generateSubgraphYaml(configPath) {
         };
         subgraphConfig.dataSources.push(dataSource);
     }
+    // Write the updated networks.json
+    fs.writeFileSync(networksPath, JSON.stringify(networksConfig, null, 2), "utf-8");
     // Write the YAML file
     var yamlContent = yaml.dump(subgraphConfig, {
         noRefs: true,
@@ -138,5 +160,5 @@ function generateSubgraphYaml(configPath) {
 // Example usage
 if (require.main === module) {
     generateSubgraphYaml("subgraph_config.json");
-    console.log("subgraph.yaml has been generated successfully!");
+    console.log("subgraph.yaml and networks.json have been updated successfully!");
 }

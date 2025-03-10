@@ -16,16 +16,18 @@ import {
   Unpaused,
   Withdraw,
   FarmlyEasyFarm as FarmlyEasyFarmEntity,
+  PricePeriod,
 } from "../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
 import { dataSource } from "@graphprotocol/graph-ts";
 import { FarmlyEasyFarm } from "../generated/FarmlyEasyFarm/FarmlyEasyFarm";
 import { BigInt } from "@graphprotocol/graph-ts";
 import { Bytes } from "@graphprotocol/graph-ts";
-import { FarmlyBollingerBandsStrategy } from "../generated/FarmlyBollingerBandsStrategy/FarmlyBollingerBandsStrategy";
+import { FarmlyBollingerBandsStrategy } from "../generated/FarmlyEasyFarm/FarmlyBollingerBandsStrategy";
 import { Address } from "@graphprotocol/graph-ts";
 
 export function handleInitialize(block: ethereum.Block): void {
+  const hourIndex = block.timestamp.toI32() / 3600;
   let address = dataSource.address();
 
   let contract = FarmlyEasyFarm.bind(address);
@@ -46,6 +48,7 @@ export function handleInitialize(block: ethereum.Block): void {
   entity.token1 = contract.token1();
   entity.token0Decimals = BigInt.fromI32(contract.token0Decimals());
   entity.token1Decimals = BigInt.fromI32(contract.token1Decimals());
+  entity.latestHourIndex = BigInt.fromI32(hourIndex);
 
   let entityPerformPosition = new PerformPosition(
     Bytes.fromUTF8(
@@ -71,8 +74,69 @@ export function handleInitialize(block: ethereum.Block): void {
   entityPerformPosition.transactionHash = Bytes.fromUTF8("0");
   entityPerformPosition.farmlyEasyFarm = address;
 
+  const hourStartUnix = hourIndex * 3600;
+  const hourEndUnix = (hourIndex + 1) * 3600;
+  const hourPeriodID = address
+    .toHexString()
+    .concat("-")
+    .concat(hourIndex.toString());
+
+  const pricePeriod = new PricePeriod(hourPeriodID);
+  pricePeriod.sharePrice = BigInt.fromString("1000000000000000000");
+  pricePeriod.latestPrice = strategyContract.latestPrice();
+  pricePeriod.latestLowerPrice = contract.latestLowerPrice();
+  pricePeriod.latestUpperPrice = contract.latestUpperPrice();
+  pricePeriod.startTimestamp = hourStartUnix;
+  pricePeriod.endTimestamp = hourEndUnix;
+  pricePeriod.farmlyEasyFarm = address;
+
   entity.save();
   entityPerformPosition.save();
+  pricePeriod.save();
+}
+
+export function handlePricePeriod(block: ethereum.Block): void {
+  const hourIndex = block.timestamp.toI32() / 3600;
+  let address = dataSource.address();
+
+  let easyFarmEntity = FarmlyEasyFarmEntity.load(address);
+  let contract = FarmlyEasyFarm.bind(address);
+  if (easyFarmEntity) {
+    const latestHourIndex = easyFarmEntity.latestHourIndex.toI32();
+    if (hourIndex > latestHourIndex) {
+      easyFarmEntity.latestHourIndex = BigInt.fromI32(hourIndex);
+      easyFarmEntity.save();
+
+      const hourStartUnix = hourIndex * 3600;
+      const hourEndUnix = (hourIndex + 1) * 3600;
+      const hourPeriodID = address
+        .toHexString()
+        .concat("-")
+        .concat(hourIndex.toString());
+
+      const strategyContract = FarmlyBollingerBandsStrategy.bind(
+        Address.fromBytes(easyFarmEntity.strategy)
+      );
+
+      const totalSupply = contract.totalSupply();
+      const totalUSDValue = contract.totalUSDValue();
+      const sharePrice = totalSupply.equals(BigInt.fromI32(0))
+        ? BigInt.fromString("1000000000000000000")
+        : totalUSDValue
+            .times(BigInt.fromString("1000000000000000000"))
+            .div(totalSupply);
+
+      const pricePeriod = new PricePeriod(hourPeriodID);
+      pricePeriod.sharePrice = sharePrice;
+      pricePeriod.latestPrice = strategyContract.latestPrice();
+      pricePeriod.latestLowerPrice = contract.latestLowerPrice();
+      pricePeriod.latestUpperPrice = contract.latestUpperPrice();
+      pricePeriod.startTimestamp = hourStartUnix;
+      pricePeriod.endTimestamp = hourEndUnix;
+      pricePeriod.farmlyEasyFarm = address;
+      pricePeriod.save();
+    }
+  }
 }
 
 export function handleApproval(event: ApprovalEvent): void {

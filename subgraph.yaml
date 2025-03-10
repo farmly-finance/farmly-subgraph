@@ -5,128 +5,60 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: FarmlyBollingerBandsStrategy
+    name: FarmlyEasyFarm
     network: base-sepolia
     source:
-      address: '0xb3dCd3Ac7a885DabECF9d6359bEcD495d7fB5245'
-      abi: FarmlyBollingerBandsStrategy
-      startBlock: 22013113
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - NewBands
-        - OwnershipTransferred
-      abis:
-        - name: FarmlyEasyFarm
-          file: ./abis/FarmlyEasyFarm.json
-        - name: FarmlyBollingerBandsStrategy
-          file: ./abis/FarmlyBollingerBandsStrategy.json
-      eventHandlers:
-        - event: NewBands(uint256,uint256,uint256,uint256,uint256)
-          handler: handleNewBands
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/farmly-bollinger-bands-strategy.ts
-      blockHandlers:
-        - handler: handleInitialize
-          filter:
-            kind: once
-  - kind: ethereum
-    name: FarmlyBollingerBandsStrategy_WETHBTC
-    network: base-sepolia
-    source:
-      address: '0xc6813Fea485321811632693AF3C3b07358b01E28'
-      abi: FarmlyBollingerBandsStrategy
-      startBlock: 22145651
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - NewBands
-        - OwnershipTransferred
-      abis:
-        - name: FarmlyEasyFarm
-          file: ./abis/FarmlyEasyFarm.json
-        - name: FarmlyBollingerBandsStrategy
-          file: ./abis/FarmlyBollingerBandsStrategy.json
-      eventHandlers:
-        - event: NewBands(uint256,uint256,uint256,uint256,uint256)
-          handler: handleNewBands
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/farmly-bollinger-bands-strategy.ts
-      blockHandlers:
-        - handler: handleInitialize
-          filter:
-            kind: once
-  - kind: ethereum
-    name: FarmlyBollingerBandsStrategy_BTCUSDC
-    network: base-sepolia
-    source:
-      address: '0x1647De7144851c907e0F1B87d0012ae7932A566e'
-      abi: FarmlyBollingerBandsStrategy
-      startBlock: 22145985
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - NewBands
-        - OwnershipTransferred
-      abis:
-        - name: FarmlyEasyFarm
-          file: ./abis/FarmlyEasyFarm.json
-        - name: FarmlyBollingerBandsStrategy
-          file: ./abis/FarmlyBollingerBandsStrategy.json
-      eventHandlers:
-        - event: NewBands(uint256,uint256,uint256,uint256,uint256)
-          handler: handleNewBands
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/farmly-bollinger-bands-strategy.ts
-      blockHandlers:
-        - handler: handleInitialize
-          filter:
-            kind: once
-  - kind: ethereum
-    name: FarmlyBollingerBandsStrategy_USDCBTC
-    network: base-sepolia
-    source:
-      address: '0x1ECBb0AF58607ecE24F9c4AAEF96F727BB6FFC62'
-      abi: FarmlyBollingerBandsStrategy
-      startBlock: 22188242
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - NewBands
-        - OwnershipTransferred
-      abis:
-        - name: FarmlyEasyFarm
-          file: ./abis/FarmlyEasyFarm.json
-        - name: FarmlyBollingerBandsStrategy
-          file: ./abis/FarmlyBollingerBandsStrategy.json
-      eventHandlers:
-        - event: NewBands(uint256,uint256,uint256,uint256,uint256)
-          handler: handleNewBands
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/farmly-bollinger-bands-strategy.ts
-      blockHandlers:
-        - handler: handleInitialize
-          filter:
-            kind: once
-  - kind: ethereum
-    name: FarmlyEasyFarm_ETHUSDC
-    network: base-sepolia
-    source:
-      address: '0x3d32e94F9Dc0bFB0d43ad7e4DB5775db869f277E'
+      address: "0x341f2865ec9B116Aa1FE3b29EB2052Bb305c7A10"
       abi: FarmlyEasyFarm
-      startBlock: 22224898
+      startBlock: 22918230
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Deposit
+        - Paused
+        - PerformPosition
+        - Transfer
+        - Unpaused
+        - Withdraw
+      abis:
+        - name: FarmlyEasyFarm
+          file: ./abis/FarmlyEasyFarm.json
+        - name: FarmlyBollingerBandsStrategy
+          file: ./abis/FarmlyBollingerBandsStrategy.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Deposit(uint256,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Paused(address)
+          handler: handlePaused
+        - event: PerformPosition(uint256,uint256,uint256)
+          handler: handlePerformPosition
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Unpaused(address)
+          handler: handleUnpaused
+        - event: Withdraw(uint256,uint256,uint256,uint256)
+          handler: handleWithdraw
+      file: ./src/farmly-easy-farm.ts
+      blockHandlers:
+        - handler: handleInitialize
+          filter:
+            kind: once
+        - handler: handlePricePeriod
+          filter:
+            kind: polling
+            every: 1
+  - kind: ethereum
+    name: FarmlyEasyFarm_WBTCETH_FIXED_RANGE
+    network: base-sepolia
+    source:
+      address: "0xD7db6799B26bB9CED0589990A9dBE383C6Dd0ebE"
+      abi: FarmlyEasyFarm
+      startBlock: 22918166
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -159,13 +91,17 @@ dataSources:
         - handler: handleInitialize
           filter:
             kind: once
+        - handler: handlePricePeriod
+          filter:
+            kind: polling
+            every: 1
   - kind: ethereum
-    name: FarmlyEasyFarm_WETHBTC
+    name: FarmlyEasyFarm_USDCBTC_FIXED_RANGE
     network: base-sepolia
     source:
-      address: '0x33555e1ee4014AED32A94FA359C0cD8616EE6Ed1'
+      address: "0xeBed27b12176B9f0CE84173140f12A3457773623"
       abi: FarmlyEasyFarm
-      startBlock: 22224989
+      startBlock: 22918056
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -198,3 +134,7 @@ dataSources:
         - handler: handleInitialize
           filter:
             kind: once
+        - handler: handlePricePeriod
+          filter:
+            kind: polling
+            every: 1

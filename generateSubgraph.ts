@@ -1,6 +1,15 @@
 import * as fs from "fs";
 import * as yaml from "js-yaml";
 
+interface NetworkConfig {
+  [network: string]: {
+    [contract: string]: {
+      address: string;
+      startBlock: number;
+    };
+  };
+}
+
 interface EventHandler {
   signature: string;
   handler: string;
@@ -8,8 +17,9 @@ interface EventHandler {
 
 interface BlockHandler {
   handler: string;
-  filter: {
+  filter?: {
     kind: string;
+    every?: number;
   };
 }
 
@@ -103,16 +113,23 @@ const entitiesEasyFarm = [
 
 const entitiesBollingerBandsStrategy = ["NewBands", "OwnershipTransferred"];
 
-const blockHandlersEasyFarm = [
+const blockHandlersEasyFarm: BlockHandler[] = [
   {
     handler: "handleInitialize",
     filter: {
       kind: "once",
     },
   },
+  {
+    handler: "handlePricePeriod",
+    filter: {
+      kind: "polling",
+      every: 1,
+    },
+  },
 ];
 
-const blockHandlersBollingerBandsStrategy = [
+const blockHandlersBollingerBandsStrategy: BlockHandler[] = [
   {
     handler: "handleInitialize",
     filter: {
@@ -126,6 +143,11 @@ function generateSubgraphYaml(configPath: string): void {
   const configContent = fs.readFileSync(configPath, "utf-8");
   const config: SubgraphConfig = JSON.parse(configContent);
 
+  // Read the networks configuration
+  const networksPath = "networks.json";
+  const networksContent = fs.readFileSync(networksPath, "utf-8");
+  const networksConfig: NetworkConfig = JSON.parse(networksContent);
+
   // Base subgraph configuration
   const subgraphConfig: SubgraphYaml = {
     specVersion: "1.0.0",
@@ -138,8 +160,20 @@ function generateSubgraphYaml(configPath: string): void {
     dataSources: [],
   };
 
-  // Add data sources from the configuration
+  // Add data sources from the configuration and update networks.json
   for (const source of config.dataSources) {
+    const network = source.network || "base-sepolia";
+
+    // Update networks.json
+    if (!networksConfig[network]) {
+      networksConfig[network] = {};
+    }
+
+    networksConfig[network][source.name] = {
+      address: source.address,
+      startBlock: source.startBlock,
+    };
+
     const mapping: Mapping = {
       kind: "ethereum/events",
       apiVersion: "0.0.7",
@@ -173,7 +207,7 @@ function generateSubgraphYaml(configPath: string): void {
     const dataSource = {
       kind: "ethereum",
       name: source.name,
-      network: source.network || "base-sepolia",
+      network: network,
       source: {
         address: source.address,
         abi: source.name.startsWith("FarmlyEasyFarm")
@@ -187,6 +221,13 @@ function generateSubgraphYaml(configPath: string): void {
     subgraphConfig.dataSources.push(dataSource);
   }
 
+  // Write the updated networks.json
+  fs.writeFileSync(
+    networksPath,
+    JSON.stringify(networksConfig, null, 2),
+    "utf-8"
+  );
+
   // Write the YAML file
   const yamlContent = yaml.dump(subgraphConfig, {
     noRefs: true,
@@ -198,5 +239,7 @@ function generateSubgraphYaml(configPath: string): void {
 // Example usage
 if (require.main === module) {
   generateSubgraphYaml("subgraph_config.json");
-  console.log("subgraph.yaml has been generated successfully!");
+  console.log(
+    "subgraph.yaml and networks.json have been updated successfully!"
+  );
 }
